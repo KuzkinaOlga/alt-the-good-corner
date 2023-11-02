@@ -8,3 +8,8 @@ export type Ad = {
   createdAt: string;
   id: number;
 };
+
+export type Category = {
+  id: number;
+  name: string;
+};

@@ -7,6 +7,12 @@ import { Ad } from './entities/ad';
 import { Category } from './entities/category';
 import { Tag } from './entities/tag';
 import { In, Like } from 'typeorm';
+import { ApolloServer } from '@apollo/server';
+import { startStandaloneServer } from '@apollo/server/standalone';
+import { GraphQLError } from 'graphql';
+import { buildSchema } from 'type-graphql';
+import AdsResolver from './resolvers/adsResolver';
+import TagsResolver from './resolvers/tagsResolver';
 
 const app = express();
 const port = 4000;
@@ -148,4 +154,17 @@ app.patch('/ads/:id', async (req: Request, res: Response) => {
 app.listen(port, async () => {
   await db.initialize();
   console.log(`Server running on http://localhost:${port}`);
+});
+
+buildSchema({
+  resolvers: [AdsResolver, TagsResolver],
+}).then((schema) => {
+  const server = new ApolloServer({
+    schema,
+  });
+  startStandaloneServer(server, {
+    listen: { port: 4001 },
+  }).then(({ url }) => {
+    console.log(`🚀  Server ready at: ${url}`);
+  });
 });
